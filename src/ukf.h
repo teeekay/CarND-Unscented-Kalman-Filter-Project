@@ -31,14 +31,19 @@ public:
   ///* predicted sigma points matrix
   MatrixXd Xsig_pred_;
 
-  ///* time when the state is true, in us
-  long long time_us_;
+  ///* measurement noise covariance matrix (forRadar)
+  MatrixXd RR_;
+
+  ///* measurement noise covariance matrix (for Lidar)
+  MatrixXd RL_;
 
   ///* Process noise standard deviation longitudinal acceleration in m/s^2
   double std_a_;
+  double std_a_sq_; //square of std_a
 
   ///* Process noise standard deviation yaw acceleration in rad/s^2
   double std_yawdd_;
+  double std_yawdd_sq_;//square of std_a
 
   ///* Laser measurement noise standard deviation position1 in m
   double std_laspx_;
@@ -64,8 +69,27 @@ public:
   ///* Augmented state dimension
   int n_aug_;
 
+  ///* number of Sigma points
+  int n_sig_;
+
+  //radar measurement dimension, radar can measure r, phi, and r_dot
+  int n_z_radar_;
+  int n_z_lidar_;
+
   ///* Sigma point spreading parameter
   double lambda_;
+
+  ///* step counter
+  int step_;
+
+  ///* current NIS for laser
+  double NIS_laser_;
+
+  ///* current NIS for radar
+  double NIS_radar_;
+
+  ///* timestamp on previous step
+  long long previous_timestamp_;
 
 
   /**

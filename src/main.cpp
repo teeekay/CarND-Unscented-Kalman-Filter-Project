@@ -10,6 +10,13 @@ using namespace std;
 // for convenience
 using json = nlohmann::json;
 
+//#define DEBUG
+#ifdef DEBUG
+#define D(x) x
+#else
+#define D(x)
+#endif
+
 // Checks if the SocketIO event has JSON data.
 // If there is data the JSON object in string format will be returned,
 // else the empty string "" will be returned.
@@ -26,8 +33,30 @@ std::string hasData(std::string s) {
   return "";
 }
 
-int main()
+int main(int argc, char* argv[])
 {
+  //code to output NIS to output file if file specified on cmd line as first arg
+  ofstream outfile;
+  if(argc >1){
+    outfile.open(argv[1],ofstream::out);
+    outfile << "timestamp" << ", ";
+    outfile << "sensor" << ", ";
+    outfile << "x_true" << ", ";
+    outfile << "y_true" << ", ";
+    outfile << "vx_true" << ", ";
+    outfile << "vy_true" << ", ";
+    outfile << "x_est" << ", ";
+    outfile << "y_est" << ", ";
+    outfile << "vx_est" << ", ";
+    outfile << "vy_est" << ", ";
+    outfile << "rmse_x" << ", ";
+    outfile << "rmse_y" << ", ";
+    outfile << "rmse_vx" << ", ";
+    outfile << "rmse_vy" << ", ";
+    outfile << "nis" << endl;
+  }
+
+
   uWS::Hub h;
 
   // Create a Kalman Filter instance
@@ -38,7 +67,7 @@ int main()
   vector<VectorXd> estimations;
   vector<VectorXd> ground_truth;
 
-  h.onMessage([&ukf,&tools,&estimations,&ground_truth](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, uWS::OpCode opCode) {
+  h.onMessage([&ukf,&tools,&estimations,&ground_truth,&outfile](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
     // The 4 signifies a websocket message
     // The 2 signifies a websocket event
@@ -48,16 +77,16 @@ int main()
 
       auto s = hasData(std::string(data));
       if (s != "") {
-      	
+
         auto j = json::parse(s);
 
         std::string event = j[0].get<std::string>();
-        
+
         if (event == "telemetry") {
           // j[1] is the data JSON object
-          
+
           string sensor_measurment = j[1]["sensor_measurement"];
-          
+
           MeasurementPackage meas_package;
           istringstream iss(sensor_measurment);
     	  long long timestamp;
@@ -90,7 +119,7 @@ int main()
           		iss >> timestamp;
           		meas_package.timestamp_ = timestamp;
           }
-          float x_gt;
+        float x_gt;
     	  float y_gt;
     	  float vx_gt;
     	  float vy_gt;
@@ -100,13 +129,13 @@ int main()
     	  iss >> vy_gt;
     	  VectorXd gt_values(4);
     	  gt_values(0) = x_gt;
-    	  gt_values(1) = y_gt; 
+    	  gt_values(1) = y_gt;
     	  gt_values(2) = vx_gt;
     	  gt_values(3) = vy_gt;
     	  ground_truth.push_back(gt_values);
-          
+
           //Call ProcessMeasurment(meas_package) for Kalman filter
-    	  ukf.ProcessMeasurement(meas_package);    	  
+    	  ukf.ProcessMeasurement(meas_package);
 
     	  //Push the current estimated x,y positon from the Kalman filter's state vector
 
@@ -124,7 +153,7 @@ int main()
     	  estimate(1) = p_y;
     	  estimate(2) = v1;
     	  estimate(3) = v2;
-    	  
+
     	  estimations.push_back(estimate);
 
     	  VectorXd RMSE = tools.CalculateRMSE(estimations, ground_truth);
@@ -139,10 +168,31 @@ int main()
           auto msg = "42[\"estimate_marker\"," + msgJson.dump() + "]";
           // std::cout << msg << std::endl;
           ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);
-	  
+
+          //output NIS values to file
+          if (outfile.is_open()){
+            outfile << fixed << setprecision(4) << timestamp << ", ";
+            outfile << sensor_type << ", ";
+            outfile << fixed << setprecision(4) << x_gt << ", ";
+            outfile << fixed << setprecision(4) << y_gt << ", ";
+            outfile << fixed << setprecision(4) << vx_gt << ", ";
+            outfile << fixed << setprecision(4) << vy_gt << ", ";
+            outfile << fixed << setprecision(4) << p_x << ", ";
+            outfile << fixed << setprecision(4) << p_y << ", ";
+            outfile << fixed << setprecision(4) << v1 << ", ";
+            outfile << fixed << setprecision(4) << v2 << ", ";
+            outfile << fixed << setprecision(4) << RMSE(0) << ", ";
+            outfile << fixed << setprecision(4) << RMSE(1) << ", ";
+            outfile << fixed << setprecision(4) << RMSE(2) << ", ";
+            outfile << fixed << setprecision(4) << RMSE(3) << ", ";
+            double nis;
+            if (sensor_type.compare("L") == 0) nis = ukf.NIS_laser_;
+            else if (sensor_type.compare("R") == 0) nis = ukf.NIS_radar_;
+            outfile << fixed << setprecision(4) << nis << endl;
+          }
         }
       } else {
-        
+
         std::string msg = "42[\"manual\",{}]";
         ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);
       }
@@ -185,91 +235,8 @@ int main()
     return -1;
   }
   h.run();
+
+  if (outfile.is_open()){
+    outfile.close();
+  }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
