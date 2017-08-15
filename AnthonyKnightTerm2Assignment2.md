@@ -1,25 +1,12 @@
 ## **Unscented Kalman Filter Project**
 
 ---
-<object data="https://github.com/teeekay/CarND-Unscented-Kalman-Filter-Project/blob/master/Output/Test30_NIS_Radar.pdf" type="application/pdf" width="700px" height="700px">
-    <embed src="https://github.com/teeekay/CarND-Unscented-Kalman-Filter-Project/blob/master/Output/Test30_NIS_Radar.pdf">
-        This browser does not support PDFs. Please download the PDF to view it: <a href="https://github.com/teeekay/CarND-Unscented-Kalman-Filter-Project/blob/master/Output/Test30_NIS_Radar.pdf">Download PDF</a>.</p>
-    </embed>
-</object>
-
-
-<object data="https://github.com/teeekay/CarND-Unscented-Kalman-Filter-Project/blob/master/Output/Test30_NIS_Laser.pdf" type="application/pdf" width="700px" height="700px">
-    <embed src="https://github.com/teeekay/CarND-Unscented-Kalman-Filter-Project/blob/master/Output/Test30_NIS_Laser.pdf">
-        This browser does not support PDFs. Please download the PDF to view it: <a href="https://github.com/teeekay/CarND-Unscented-Kalman-Filter-Project/blob/master/Output/Test30_NIS_Laser.pdf">Download PDF</a>.</p>
-    </embed>
-</object>
+<img src="https://github.com/teeekay/CarND-Unscented-Kalman-Filter-Project/blob/master/Output/NIS_Radar.png?raw=true"  width=500>
+<img src="https://github.com/teeekay/CarND-Unscented-Kalman-Filter-Project/blob/master/Output/NIS_Laser.png?raw=true"  width=500>
 
 <i><u>Figure 1: NIS values on Run1 of Simulator</u></i>
 
 ---
-
-
-
 
 
 
