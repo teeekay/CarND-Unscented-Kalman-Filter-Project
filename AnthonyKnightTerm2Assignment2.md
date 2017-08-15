@@ -21,8 +21,9 @@ These values were produced when the following process noise settings were used:
 | 1.0 | PI / 4 |
 
 and the initial covariance matrix P_ was set to:
+
 |col 1|col 2|col 3|col 4|col 5|
-|-|-|-|-|-|
+|--|--|--|--|--|
 |0.02| 0  | 0 | 0 | 0|
 |0 |0.02| 0  | 0 | 0 |
 |0|0|1|0|0|
